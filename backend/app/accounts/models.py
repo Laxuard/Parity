@@ -1,13 +1,20 @@
+from __future__ import annotations
+
 from datetime import datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid6 import uuid7
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.auth.models import User
+    from app.ledger.models import LedgerEntry
 
 
 class AccountType(StrEnum):
@@ -60,5 +67,5 @@ class Account(Base):
         onupdate=func.now(),
     )
 
-    # Optional 2-way relationship if User defines: accounts = relationship(...)
-    # user: Mapped["User | None"] = relationship(back_populates="accounts")
+    user: Mapped[User | None] = relationship(back_populates="accounts")
+    ledger_entries: Mapped[list[LedgerEntry]] = relationship(back_populates="account")
